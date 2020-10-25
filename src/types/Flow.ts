@@ -1,10 +1,10 @@
-export type FieldTypes = (
+export type StepTypes = (
   'date' | 'thank-you' | 'welcome' | 'multiple-choice' | 'phone-number' |
   'short-text' | 'long-text' | 'boolean' | 'email'
 );
 
-export interface FlowField {
-  type: FieldTypes;
+export interface FlowStep {
+  type: StepTypes;
   label: string;
   required: boolean;
   order: number;
@@ -13,9 +13,9 @@ export interface FlowField {
 }
 
 export interface FlowDescriptor {
-  fields: FlowField[];
-  description: string;
   id: string;
+  description: string;
+  steps: FlowStep[];
 }
 
 export default FlowDescriptor;

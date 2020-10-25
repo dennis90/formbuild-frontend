@@ -18,7 +18,7 @@ export default function FormView() {
       .then((doc) => {
         if (doc.exists) {
           const formData: FlowDescriptor = doc.data() as FlowDescriptor;
-          formData.fields = formData.fields.sort((a, b) => {
+          formData.steps = formData.steps.sort((a, b) => {
             if (a.order > b.order) {
               return 1;
             } else if (b.order > a.order) {
@@ -47,7 +47,7 @@ export default function FormView() {
 
       {formState &&
         <StyledContainer>
-          {formState.fields.map((formField, idx) =>
+          {formState.steps.map((formField, idx) =>
             <StyledFieldContainer key={idx} fieldOrder={idx} formStep={formStep}>
               {formField.label}
               {formField.type === 'short-text' &&
@@ -57,7 +57,7 @@ export default function FormView() {
           )}
           <StyledButtonsContainer>
             {formStep > 0 && <StyledPrevButton onClick={() => setFormStep(formStep - 1)}>Back</StyledPrevButton>}
-            {formStep < formState.fields.length - 1 && <StyledNextButton onClick={() => setFormStep(formStep + 1)}>Next</StyledNextButton>}
+            {formStep < formState.steps.length - 1 && <StyledNextButton onClick={() => setFormStep(formStep + 1)}>Next</StyledNextButton>}
           </StyledButtonsContainer>
         </StyledContainer>
       }

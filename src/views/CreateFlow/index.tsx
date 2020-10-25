@@ -2,10 +2,8 @@ import { gql, useMutation } from '@apollo/client';
 import React, { useState } from 'react';
 
 import Alert from 'components/Alert';
-import PrimaryButton from 'components/PrimaryButton';
-import TextField from 'components/form/TextField';
-import FieldsForm, { FieldChangeHandler } from './FieldsForm';
-import { FlowField } from 'types/Flow';
+import FlowForm, { FieldChangeHandler } from 'components/FlowForm';
+import FlowDescriptor from 'types/Flow';
 
 const CREATE_FLOW_MUTATOR = gql`
   mutation CreateFlow($flow: FlowInputType!) {
@@ -19,65 +17,43 @@ const CREATE_FLOW_MUTATOR = gql`
 const CreateFlow = () => {
   const [createFlowMutator, { data, error, loading }] = useMutation(CREATE_FLOW_MUTATOR);
 
-  const [flowDescription, setFlowDescription] = useState<string>('');
-  const [fields, setFields] = useState<FlowField[]>([{
-    type: 'welcome',
-    label: 'Seja bem vindo ao meu Formulário',
-    order: 0,
-    required: false,
-  }]);
+  const [flowDescriptor, setFlowDescriptor] = useState<Omit<FlowDescriptor, 'id'>>({
+    description: '',
+    steps: [{
+      type: 'welcome',
+      label: 'Seja bem vindo ao meu Formulário',
+      order: 0,
+      required: false,
+    }],
+  });
 
-  const nameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    setFlowDescription(event.currentTarget.value);
+  const fieldChangeHandler: FieldChangeHandler = (key, value) => {
+    setFlowDescriptor({ ...flowDescriptor!, [key]: value });
   };
 
-  const fieldChangeHandler = (index: number): FieldChangeHandler => (key, value): void => {
-    const listClone = [...fields];
-    listClone[index][key] = value;
-    setFields(listClone);
-  };
+  const formSubmitHandler = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-  const flowSaveHandler = () => {
     createFlowMutator({
       variables: {
-        flow: {
-          description: flowDescription,
-          fields,
-        }
-      }
-    })
+        flow: flowDescriptor,
+      },
+    });
   }
 
   return (
     <div>
-      <TextField
-        id="description"
-        label="Descrição"
-        onChange={nameChangeHandler}
-        value={flowDescription}
-      />
-      <div>
-        {fields.map((field, index) => (
-          <FieldsForm
-            onFieldChange={fieldChangeHandler(index)}
-            field={field}
-            key={field.order}
-          />
-        ))}
-      </div>
-
-      {(data?.message || error) &&
-        <Alert status="error">
-          {data?.message || String(error)}
-        </Alert>
-      }
-
-      <PrimaryButton
-        onClick={flowSaveHandler}
-        loading={loading}
+      <FlowForm
+        {...flowDescriptor}
+        onFieldChange={fieldChangeHandler}
+        onSubmit={formSubmitHandler}
       >
-        Salvar Fluxo
-      </PrimaryButton>
+        {(data?.message || error) &&
+          <Alert status="error">
+            {data?.message || String(error)}
+          </Alert>
+        }
+      </FlowForm>
     </div>
   );
 };

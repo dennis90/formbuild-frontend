@@ -12,7 +12,7 @@ const FLOWS_LISTING_QUERY = gql`
     flows {
       id
       description
-      fields {
+      steps {
         type
       }
     }

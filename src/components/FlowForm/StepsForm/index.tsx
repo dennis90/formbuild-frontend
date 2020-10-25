@@ -1,32 +1,35 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import TextField from 'components/form/TextField';
 import SelectField, { Option } from 'components/form/SelectField';
-import PrimaryButton from 'components/PrimaryButton';
-import { FieldTypes, FlowField } from 'types/Flow';
+import { FlowStep, StepTypes } from 'types/Flow';
 
-export type FieldChangeHandler = <K extends keyof FlowField>(key: K, value: FlowField[K]) => void;
+export type StepFieldChangeHandler = <K extends keyof FlowStep>(key: K, value: FlowStep[K]) => void;
 
 export interface FieldsFormProps {
-  onFieldChange: FieldChangeHandler;
-  field: FlowField;
+  onFieldChange: StepFieldChangeHandler;
+  step: FlowStep;
 }
 
-const FieldsForm: React.FC<FieldsFormProps> = (props) => {
+const StepsForm: React.FC<FieldsFormProps> = (props) => {
   const labelChangeHandler = (event: React.ChangeEvent<HTMLInputElement>): void => {
     props.onFieldChange('label', event.currentTarget.value);
-  }
+  };
 
   const typeChangeHandler = (event: React.ChangeEvent<HTMLSelectElement>): void => {
-    props.onFieldChange('type', event.currentTarget.value as FieldTypes );
-  }
+    props.onFieldChange('type', event.currentTarget.value as StepTypes);
+  };
+
+  const requiredChangeHandler = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    props.onFieldChange('required', event.currentTarget.checked);
+  };
 
   return (
     <div>
       <SelectField
-        id="option-type"
+        id={`step-${props.step.order}-type`}
         label="Tipo"
-        value={props.field.type}
+        value={props.step.type}
         onChange={typeChangeHandler}
       >
         <Option label="Boas vindas" value="welcome"/>
@@ -41,13 +44,20 @@ const FieldsForm: React.FC<FieldsFormProps> = (props) => {
       </SelectField>
 
       <TextField
-        id="option-label"
+        id={`step-${props.step.order}-label`}
         label="Legenda"
-        value={props.field.label}
+        value={props.step.label}
         onChange={labelChangeHandler}
+      />
+
+      <input
+        id={`step-${props.step.order}-required`}
+        type="checkbox"
+        checked={props.step.required}
+        onChange={requiredChangeHandler}
       />
     </div>
   );
 };
 
-export default FieldsForm;
+export default StepsForm;
