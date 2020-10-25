@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
+import TextField from 'components/form/TextField';
 import { auth, googleAuthProvider } from 'services/firebase';
+import Alert from 'components/Alert';
 
 interface SignInFormProps {
   errorMessage?: string;
@@ -31,38 +33,26 @@ const SignIn: React.FC<SignInFormProps> = (props) => {
   return (
     <div>
       <form onSubmit={signInFormSubmitHandler}>
-        <div>
-          <label htmlFor="user-password">
-            E-mail
-          </label>
+        <TextField
+          label="e-mail"
+          type="email"
+          id="user-email"
+          value={userEmail}
+          onChange={(ev) => setUserEmail(ev.currentTarget.value)}
+        />
 
-          <input
-            type="email"
-            required
-            id="user-email"
-            value={userEmail}
-            onChange={(ev) => setUserEmail(ev.currentTarget.value)}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="user-password">
-            Senha
-          </label>
-
-          <input
-            type="password"
-            required
-            id="user-password"
-            value={userPassword}
-            onChange={(ev) => setUserPassword(ev.currentTarget.value)}
-          />
-        </div>
+        <TextField
+          type="password"
+          id="user-password"
+          label="Senha"
+          value={userPassword}
+          onChange={(ev) => setUserPassword(ev.currentTarget.value)}
+        />
 
         {(props.errorMessage || authError) &&
-          <div style={{ color: 'red', fontWeight: 600 }}>
+          <Alert status="error">
             {props.errorMessage || String(authError)}
-          </div>
+          </Alert>
         }
 
         <button type="submit">
