@@ -1,4 +1,4 @@
-import { useQuery, gql } from '@apollo/client';
+import { useQuery, useMutation, gql } from '@apollo/client';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -19,8 +19,29 @@ const FLOWS_LISTING_QUERY = gql`
   }
 `;
 
-export default function FormsListing() {
-  const { loading, error, data } = useQuery<{ flows: FlowDescriptor[] }>(FLOWS_LISTING_QUERY);
+const FLOW_DELETE_MUTATOR = gql`
+  mutation DeleteFlow($id: String!) {
+    deleteFlow(id: $id) {
+      success
+      message
+    }
+  }
+
+`;
+
+const FormsListing: React.FC = () => {
+  const { loading, error, data, refetch } = useQuery<{ flows: FlowDescriptor[] }>(FLOWS_LISTING_QUERY);
+  const [ deleteFlowMutator, mutationState ] = useMutation(FLOW_DELETE_MUTATOR);
+
+  const deleteFlowClickHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    await deleteFlowMutator({
+      variables: {
+        id: event.currentTarget.dataset.flowId,
+      },
+    });
+
+    await refetch();
+  };
 
   return (
     <div>
@@ -30,7 +51,7 @@ export default function FormsListing() {
 
       {error &&
         <Alert status="error">
-          {String(error)}
+          {String(error)}id: string
         </Alert>
       }
 
@@ -46,8 +67,16 @@ export default function FormsListing() {
             <Link to={EDIT_ROUTE(flow.id)}>
               {flow.description}
             </Link>
+
+            {!mutationState.loading &&
+              <button data-flow-id={flow.id} onClick={deleteFlowClickHandler}>
+                Excluir
+              </button>
+            }
           </div>
       ))}
     </div>
   );
-}
+};
+
+export default FormsListing;
